@@ -70,42 +70,27 @@ class Seller extends Authenticatable
         });
     }
 
-    public static function register(array $data): Seller {
+    public static function register(array $data): Seller
+    {
+        if (!array_key_exists('status', $data)) {
+            $data['status'] = SellerStatus::PENDING->name;
+        }
+
         return static::create($data);
     }
 
-    public function batal(array $data) {
+    public static function batal(array $data): bool
+    {
         try {
-            $seller = Seller::query()->find($data['id']);
+            $seller = static::find($data['id']);
+            if (!$seller) {
+                return false;
+            }
             $seller->status = SellerStatus::REJECTED->name;
             $seller->save();
             return true;
         } catch (\Exception $e) {
             return false;
-        }
-    }
-
-    public function find(string $id) {
-        try {
-            $seller = Seller::query()->find($id);
-            if(!$seller) {
-                return null;
-            }
-            return $seller;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    public function findAll() {
-        try {
-            $sellers = Seller::query()->get();
-            if(empty($sellers)) {
-                return null;
-            }
-            return $sellers;
-        } catch (\Exception $e) {
-            return null;
         }
     }
 
