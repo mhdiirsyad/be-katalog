@@ -7,14 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class SellerStoreRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return false;
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -22,8 +14,8 @@ class SellerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'storename' => ['required', 'string', 'max:255'],
-            'store_description' => ['required', 'string'],
+            'store_name' => ['required', 'string', 'max:255'],
+            'store_description' => ['nullable', 'string'],
             'pic_name' => ['required', 'string', 'max:255', 'unique:sellers,pic_name'],
             'pic_phone' => ['required', 'string', 'max:20'],
             'pic_email' => ['required', 'string', 'email', 'max:255', 'unique:sellers,pic_email'],

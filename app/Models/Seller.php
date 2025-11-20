@@ -8,6 +8,7 @@ use App\SellerStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class Seller extends Authenticatable
@@ -59,16 +60,18 @@ class Seller extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function register(array $data) {
-        try {
-            $seller = new Seller();
-            $seller->fill($data);
-            $seller->status = SellerStatus::PENDING->name;
-            $seller->save();
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected static function booted(): void
+    {
+        static::creating(function ($m) {
+            $m->id = (string) Str::uuid();
+        });
+    }
+
+    public static function register(array $data): Seller {
+        return static::create($data);
     }
 
     public function batal(array $data) {
@@ -104,5 +107,9 @@ class Seller extends Authenticatable
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function products() {
+        return $this->hasMany(Product::class, 'seller_id', 'id');
     }
 }

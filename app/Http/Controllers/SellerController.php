@@ -11,14 +11,15 @@ class SellerController extends Controller
     public function store(SellerStoreRequest $request) {
         $data = $request->validated();
         try {
-            $success = Seller::register($data);
-            if(!$success) {
+            $seller = Seller::register($data);
+            if(!$seller) {
                 return response()->json([
                     'message' => 'Gagal membuat seller',
                 ], 500);
             }
             return response()->json([
-                'message' => 'Seller berhasil dibuat'
+                'message' => 'Seller berhasil dibuat',
+                'data' => new SellerResource($seller),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -52,11 +53,11 @@ class SellerController extends Controller
     public function index() {
         try {
             $sellers = Seller::findAll();
-            if(!$sellers) {
+            if($sellers->isEmpty()) {
                 return response()->json([
                     'message' => 'No sellers found',
-                    'data' => null
-                ], 404);
+                    'data' => []
+                ], 200);
             };
             return response()->json([
                 'message' => 'Sellers retrieved successfully',
