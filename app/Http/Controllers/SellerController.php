@@ -52,7 +52,7 @@ class SellerController extends Controller
 
     public function index() {
         try {
-            $sellers = Seller::findAll();
+            $sellers = Seller::get();
             if($sellers->isEmpty()) {
                 return response()->json([
                     'message' => 'No sellers found',
