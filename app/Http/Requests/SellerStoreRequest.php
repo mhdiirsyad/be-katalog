@@ -31,8 +31,8 @@ class SellerStoreRequest extends FormRequest
             'pic_city' => ['required', 'string', 'max:255'],
             'pic_province' => ['required', 'string', 'max:255'],
             'pic_ktp_number' => ['required', 'string', 'max:255', 'unique:sellers,pic_ktp_number'],
-            'pic_photo_path' => ['required', 'string', 'max:255'],
-            'pic_ktp_file_path' => ['required', 'string', 'max:255'],
+            'pic_photo_path' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'pic_ktp_file_path' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'password' => ['required', 'string', 'min:8'],
         ];
     }
