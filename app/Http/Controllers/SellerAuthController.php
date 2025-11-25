@@ -14,12 +14,11 @@ class SellerAuthController extends Controller
     public function login(SellerLoginRequest $request)
     {
         $data = $request->validated();
-
         $identifier = $data['identifier'];
 
-        // find by email or phone
-        $seller = Seller::where('pic_email', $identifier)
-            ->orWhere('pic_phone', $identifier)
+        // Cari berdasarkan email_pic ATAU no_hp_pic
+        $seller = Seller::where('email_pic', $identifier)
+            ->orWhere('no_hp_pic', $identifier)
             ->first();
 
         if (!$seller || !Hash::check($data['password'], $seller->password)) {
@@ -27,9 +26,9 @@ class SellerAuthController extends Controller
         }
 
         // allow login only for approved sellers
-        if ($seller->status !== SellerStatus::ACTIVE->name) {
-            return response()->json(['message' => 'Account not approved'], 403);
-        }
+        // if ($seller->status !== SellerStatus::ACTIVE->name) {
+        //     return response()->json(['message' => 'Account not approved'], 403);
+        // }
 
         $device = $data['device_name'] ?? 'api-client';
         $token = $seller->createToken($device)->plainTextToken;

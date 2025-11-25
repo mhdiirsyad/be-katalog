@@ -8,6 +8,7 @@ use App\Models\Seller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class SellerController extends Controller
 {
@@ -15,11 +16,12 @@ class SellerController extends Controller
         $data = $request->validated();
         try {
             // handle uploaded files
-            if ($request->hasFile('pic_photo_path')) {
-                $data['pic_photo_path'] = $request->file('pic_photo_path')->store('seller_photos', 'public');
+            if ($request->hasFile('foto_pic')) {
+                $data['foto_pic'] = $request->file('foto_pic')->store('seller_photos', 'public');
             }
-            if ($request->hasFile('pic_ktp_file_path')) {
-                $data['pic_ktp_file_path'] = $request->file('pic_ktp_file_path')->store('seller_ktp', 'public');
+            // Upload File KTP
+            if ($request->hasFile('file_ktp_pic')) {
+                $data['file_ktp_pic'] = $request->file('file_ktp_pic')->store('seller_ktp', 'public');
             }
 
             // ensure password is hashed
@@ -72,15 +74,17 @@ class SellerController extends Controller
         }
     }
 
-    public function index() {
+    public function index(Request $request) {
         try {
-            $sellers = Seller::get();
-            if($sellers->isEmpty()) {
-                return response()->json([
-                    'message' => 'No sellers found',
-                    'data' => []
-                ], 200);
-            };
+            $query = Seller::query();
+
+            // Kalau admin kirim ?status=PENDING, cuma muncul yang pending
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $sellers = $query->get();
+
             return response()->json([
                 'message' => 'Sellers retrieved successfully',
                 'data' => SellerResource::collection($sellers),
@@ -90,6 +94,53 @@ class SellerController extends Controller
                 'message' => 'Failed to retrieve sellers',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    // 2. FITUR BARU: Approve Seller (Ubah Status jadi ACTIVE)
+    public function approve($id) {
+        try {
+            $seller = Seller::find($id);
+            if(!$seller) {
+                return response()->json(['message' => 'Seller tidak ditemukan'], 404);
+            }
+
+            // Ubah status
+            $seller->status = \App\SellerStatus::ACTIVE->name;
+            $seller->save();
+
+            // TODO NANTI: Kirim Email Notifikasi "Selamat Akun Aktif" (Sesuai SRS)
+
+            return response()->json([
+                'message' => 'Seller berhasil disetujui (ACTIVE)',
+                'data' => new SellerResource($seller)
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal approve', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    // 3. FITUR BARU: Reject Seller (Ubah Status jadi REJECTED)
+    public function reject($id) {
+        try {
+            $seller = Seller::find($id);
+            if(!$seller) {
+                return response()->json(['message' => 'Seller tidak ditemukan'], 404);
+            }
+
+            $seller->status = \App\SellerStatus::REJECTED->name;
+            $seller->save();
+
+            // TODO NANTI: Kirim Email Notifikasi "Maaf Ditolak" (Sesuai SRS)
+
+            return response()->json([
+                'message' => 'Seller ditolak (REJECTED)',
+                'data' => new SellerResource($seller)
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal reject', 'error' => $e->getMessage()], 500);
         }
     }
 }
