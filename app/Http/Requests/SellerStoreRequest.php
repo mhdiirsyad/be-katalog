@@ -19,21 +19,31 @@ class SellerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_name' => ['required', 'string', 'max:255', 'unique:sellers,store_name'],
-            'store_description' => ['nullable', 'string'],
-            'pic_name' => ['required', 'string', 'max:255'],
-            'pic_phone' => ['required', 'string', 'max:20', 'unique:sellers,pic_phone'],
-            'pic_email' => ['required', 'string', 'email', 'max:255', 'unique:sellers,pic_email'],
-            'pic_street' => ['required', 'string', 'max:255'],
-            'pic_RT' => ['required', 'string', 'max:10'],
-            'pic_RW' => ['required', 'string', 'max:10'],
-            'pic_village' => ['required', 'string', 'max:255'],
-            'pic_city' => ['required', 'string', 'max:255'],
-            'pic_province' => ['required', 'string', 'max:255'],
-            'pic_ktp_number' => ['required', 'string', 'max:255', 'unique:sellers,pic_ktp_number'],
-            'pic_photo_path' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'pic_ktp_file_path' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
-            'password' => ['required', 'string', 'min:8'],
+            // 1. Informasi Toko
+            'nama_toko' => 'required|string|max:255|unique:sellers,nama_toko',
+            'deskripsi_singkat' => 'nullable|string|max:255', // Nullable (opsional) sesuai migrasi
+            
+            // 2. Informasi PIC (Personal)
+            'nama_pic' => 'required|string|max:255',
+            'no_hp_pic' => 'required|string|max:20|unique:sellers,no_hp_pic',
+            'email_pic' => 'required|email|max:255|unique:sellers,email_pic',
+            
+            // 3. Alamat PIC
+            'alamat_pic' => 'required|string|max:255',
+            'rt' => 'required|string|max:5', 
+            'rw' => 'required|string|max:5', 
+            'nama_kelurahan' => 'required|string|max:255',
+            'nama_kecamatan' => 'required|string|max:255', 
+            'kabupaten_kota' => 'required|string|max:255',
+            'propinsi' => 'required|string|max:255',
+
+            // 4. Dokumen & Identitas
+            'no_ktp_pic' => 'required|string|size:16|unique:sellers,no_ktp_pic', // KTP wajib 16 digit
+            'foto_pic' => 'required|image|max:2048', // Maks 2MB, wajib gambar
+            'file_ktp_pic' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Maks 2MB, bisa PDF/Gambar
+            
+            // 5. Keamanan
+            'password' => 'required|string|min:8',
         ];
     }
 }
