@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use Laravolt\Indonesia\Models\Village;
 
 class Seller extends Authenticatable
 {
@@ -97,5 +98,9 @@ class Seller extends Authenticatable
 
     public function products() {
         return $this->hasMany(Product::class, 'seller_id', 'id');
+    }
+
+    public function village() {
+        return $this->belongsTo(Village::class, 'nama_kelurahan', 'code');
     }
 }

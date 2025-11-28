@@ -3,8 +3,12 @@
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\SellerAuthController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\IndonesiaRegionController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// (CORS preflight handled by global CORS middleware/config)
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +24,8 @@ Route::post('/seller/register', [SellerController::class, 'store']);
 // 2. Pintu Login
 Route::post('seller/login', [SellerAuthController::class, 'login']);
 Route::post('admin/login', [AdminAuthController::class, 'login']);
+
+Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 
 
 /*
@@ -48,4 +54,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Endpoint Khusus Admin untuk Verifikasi Penjual
     Route::put('/sellers/{id}/approve', [SellerController::class, 'approve']);
     Route::put('/sellers/{id}/reject', [SellerController::class, 'reject']);
+
+    Route::apiResource('products', ProductController::class);
+});
+
+// Endpoint Alamat Indonesia
+Route::prefix('region')->group(function () {
+    Route::get('/provinces', [IndonesiaRegionController::class, 'getProvinces']);
+    Route::get('/cities/{provinceCode}', [IndonesiaRegionController::class, 'getCities']);
+    Route::get('/districts/{cityCode}', [IndonesiaRegionController::class, 'getDistrics']);
+    Route::get('/villages/{districtCode}', [IndonesiaRegionController::class, 'getVillages']);
 });
