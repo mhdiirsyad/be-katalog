@@ -48,4 +48,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Endpoint Khusus Admin untuk Verifikasi Penjual
     Route::put('/sellers/{id}/approve', [SellerController::class, 'approve']);
     Route::put('/sellers/{id}/reject', [SellerController::class, 'reject']);
+
+    // Product & Category
+    Route::get('/categories', [ProductController::class, 'getCategories']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/seller/stats', [ProductController::class, 'getSellerStats']);
 });

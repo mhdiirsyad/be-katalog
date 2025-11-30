@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SellerLoginRequest;
 use App\Http\Resources\SellerResource;
 use App\Models\Seller;
-use App\SellerStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException; // Tambahkan ini
 
 class SellerAuthController extends Controller
 {
@@ -16,39 +16,31 @@ class SellerAuthController extends Controller
         $data = $request->validated();
         $identifier = $data['identifier'];
 
-        // Cari berdasarkan email_pic ATAU no_hp_pic
         $seller = Seller::where('email_pic', $identifier)
             ->orWhere('no_hp_pic', $identifier)
             ->first();
 
         if (!$seller || !Hash::check($data['password'], $seller->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            // Mengembalikan error validation standard agar bisa ditangkap frontend dengan mudah
+            throw ValidationException::withMessages([
+                'identifier' => ['Kredensial yang diberikan salah.'],
+            ]);
         }
 
-        // allow login only for approved sellers
-        // if ($seller->status !== SellerStatus::ACTIVE->name) {
-        //     return response()->json(['message' => 'Account not approved'], 403);
-        // }
-
-        $device = $data['device_name'] ?? 'api-client';
+        // Generate Token
+        $device = $data['device_name'] ?? 'nuxt-client';
         $token = $seller->createToken($device)->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful',
-            'data' => new SellerResource($seller),
+            'data' => new SellerResource($seller), // Data user yang sudah diformat Resource
             'token' => $token,
         ], 200);
     }
 
     public function logout(Request $request)
     {
-        /** @var Seller $seller */
-        $seller = $request->user();
-        if ($seller) {
-            // revoke current access token
-            $request->user()->currentAccessToken()->delete();
-        }
-
+        $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out'], 200);
     }
 }

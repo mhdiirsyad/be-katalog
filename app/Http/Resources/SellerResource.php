@@ -7,29 +7,33 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SellerResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
+        // Kiri: Key yang diterima Frontend
+        // Kanan: Nama kolom di Database (Model Seller)
         return [
             'id' => $this->id,
-            'store_name' => $this->store_name,
-            'store_description' => $this->store_description,
-            'pic_name' => $this->pic_name,
-            'pic_phone' => $this->pic_phone,
-            'pic_email' => $this->pic_email,
-            'pic_street' => $this->pic_street,
-            'pic_RT' => $this->pic_RT,
-            'pic_RW' => $this->pic_RW,
-            'pic_village' => $this->pic_village,
-            'pic_city' => $this->pic_city,
-            'pic_province' => $this->pic_province,
-            'pic_ktp_number' => $this->pic_ktp_number,
-            'pic_photo_path' => $this->pic_photo_path,
-            'pic_ktp_file_path' => $this->pic_ktp_file_path,
+            'store_name' => $this->nama_toko, 
+            'store_description' => $this->deskripsi_singkat,
+            'pic_name' => $this->nama_pic,
+            'pic_phone' => $this->no_hp_pic,
+            'pic_email' => $this->email_pic,
+            
+            // Alamat
+            'pic_street' => $this->alamat_pic,
+            'pic_rt' => $this->rt,
+            'pic_rw' => $this->rw,
+            'pic_village' => $this->nama_kelurahan,  // Kelurahan
+            'pic_district' => $this->nama_kecamatan, // Kecamatan (Baru ditambahkan)
+            'pic_city' => $this->kabupaten_kota,     // Kota/Kab
+            'pic_province' => $this->propinsi,
+            
+            // Dokumen
+            'pic_ktp_number' => $this->no_ktp_pic,
+            // Helper 'url' agar frontend dapat full path gambar
+            'pic_photo_url' => $this->foto_pic ? url('storage/' . $this->foto_pic) : null,
+            'pic_ktp_url' => $this->file_ktp_pic ? url('storage/' . $this->file_ktp_pic) : null,
+            
             'status' => $this->status,
         ];
     }

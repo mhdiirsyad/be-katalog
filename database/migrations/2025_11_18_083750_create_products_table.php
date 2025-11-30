@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->foreignUuid('seller_id')->constrained('sellers')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories'); // Relasi Strict
+            $table->string('name');
+            $table->integer('weight'); // gram
+            $table->integer('stock');
+            $table->decimal('price', 12, 2);
+            $table->string('photo')->nullable();
+            $table->float('rating')->default(0);
             $table->timestamps();
         });
     }

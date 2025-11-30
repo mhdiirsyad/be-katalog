@@ -23,5 +23,10 @@ class DatabaseSeeder extends Seeder
 
         // Opsional: Pesan di terminal biar tahu kalau berhasil
         $this->command->info('User Admin berhasil dibuat!');
+
+        $this->call([
+            CategorySeeder::class, // Pastikan Category dijalankan duluan
+            SellerSeeder::class,   // Baru Seller
+        ]);
     }
-}
+} 
